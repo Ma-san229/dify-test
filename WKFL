@@ -1,0 +1,776 @@
+system:
+  name: "GeneralizedTaskExecutionSystem"
+  version: "1.0"
+  description: "ユーザー入力に基づいてワークフローを生成、実行、管理する統合システム"
+
+workflow:
+  name: "GeneralizedTaskExecutionLogicWorkflow"
+  description: "ユーザー入力の意図を理解し、プロジェクトとして定義し、タスクを実行して成果物を作成するための一般化されたワークフロー"
+  steps:
+    - step:
+        name: "ユーザー入力の理解"
+        description: "ユーザーの入力を分析し、意図を抽出する"
+        command: UnderstandUserInput
+        inputs: []
+        outputs:
+          - name: "ユーザー意図"
+            type: "String"
+        dependencies: []
+        status: "Pending"
+        processing_time: "Short"
+
+    - step:
+        name: "プロジェクト定義"
+        description: "ユーザーの意図に基づいてプロジェクトを定義する"
+        command: DefineProject
+        inputs:
+          - name: "ユーザー意図"
+            type: "String"
+        outputs:
+          - name: "プロジェクト定義"
+            type: "Map"
+        dependencies:
+          - "ユーザー入力の理解"
+        status: "Pending"
+        processing_time: "Medium"
+
+    - step:
+        name: "タスク分解"
+        description: "プロジェクトを実行可能なタスクに分解する"
+        command: DecomposeTasks
+        inputs:
+          - name: "プロジェクト定義"
+            type: "Map"
+        outputs:
+          - name: "タスクリスト"
+            type: "List"
+        dependencies:
+          - "プロジェクト定義"
+        status: "Pending"
+        processing_time: "Medium"
+
+    - step:
+        name: "タスク優先順位付け"
+        description: "タスクの依存関係を分析し、優先順位を設定する"
+        command: PrioritizeTasks
+        inputs:
+          - name: "タスクリスト"
+            type: "List"
+        outputs:
+          - name: "優先順位付きタスクリスト"
+            type: "List"
+        dependencies:
+          - "タスク分解"
+        status: "Pending"
+        processing_time: "Short"
+
+    - step:
+        name: "リソース割り当て"
+        description: "各タスクに必要なリソースを割り当てる"
+        command: AllocateResources
+        inputs:
+          - name: "優先順位付きタスクリスト"
+            type: "List"
+        outputs:
+          - name: "リソース割り当て済みタスクリスト"
+            type: "List"
+        dependencies:
+          - "タスク優先順位付け"
+        status: "Pending"
+        processing_time: "Medium"
+
+    - step:
+        name: "タスク実行"
+        description: "各タスクを順番に実行し、中間成果物を生成する"
+        command: ExecuteTasks
+        inputs:
+          - name: "リソース割り当て済みタスクリスト"
+            type: "List"
+        outputs:
+          - name: "タスク実行結果"
+            type: "List"
+        dependencies:
+          - "リソース割り当て"
+        status: "Pending"
+        processing_time: "Long"
+
+    - step:
+        name: "中間成果物の統合"
+        description: "タスク実行で生成された中間成果物を統合する"
+        command: IntegrateIntermediateProducts
+        inputs:
+          - name: "タスク実行結果"
+            type: "List"
+        outputs:
+          - name: "統合成果物"
+            type: "Map"
+        dependencies:
+          - "タスク実行"
+        status: "Pending"
+        processing_time: "Medium"
+
+    - step:
+        name: "品質チェック"
+        description: "統合された成果物の品質をチェックする"
+        command: QualityCheck
+        inputs:
+          - name: "統合成果物"
+            type: "Map"
+        outputs:
+          - name: "品質チェック結果"
+            type: "Map"
+        dependencies:
+          - "中間成果物の統合"
+        status: "Pending"
+        processing_time: "Medium"
+
+    - step:
+        name: "フィードバック収集"
+        description: "ユーザーからのフィードバックを収集する"
+        command: CollectFeedback
+        inputs:
+          - name: "統合成果物"
+            type: "Map"
+        outputs:
+          - name: "ユーザーフィードバック"
+            type: "String"
+        dependencies:
+          - "品質チェック"
+        status: "Pending"
+        processing_time: "Medium"
+
+    - step:
+        name: "最終調整"
+        description: "品質チェック結果とフィードバックに基づいて最終調整を行う"
+        command: FinalAdjustment
+        inputs:
+          - name: "統合成果物"
+            type: "Map"
+          - name: "品質チェック結果"
+            type: "Map"
+          - name: "ユーザーフィードバック"
+            type: "String"
+        outputs:
+          - name: "最終成果物"
+            type: "Map"
+        dependencies:
+          - "品質チェック"
+          - "フィードバック収集"
+        status: "Pending"
+        processing_time: "Medium"
+
+    - step:
+        name: "成果物の提出"
+        description: "最終成果物をユーザーに提出する"
+        command: SubmitDeliverable
+        inputs:
+          - name: "最終成果物"
+            type: "Map"
+        outputs:
+          - name: "提出完了確認"
+            type: "Boolean"
+        dependencies:
+          - "最終調整"
+        status: "Pending"
+        processing_time: "Short"
+
+    - step:
+        name: "プロセス評価"
+        description: "全体のプロセスを評価し、改善点を特定する"
+        command: EvaluateProcess
+        inputs:
+          - name: "プロジェクト定義"
+            type: "Map"
+          - name: "タスク実行結果"
+            type: "List"
+          - name: "最終成果物"
+            type: "Map"
+        outputs:
+          - name: "プロセス評価結果"
+            type: "Map"
+        dependencies:
+          - "成果物の提出"
+        status: "Pending"
+        processing_time: "Medium"
+
+dsl:
+  name: "GeneralizedTaskExecutionLogicDSL"
+  version: "1.0"
+  description: "ユーザー入力の意図を理解し、プロジェクトとして定義し、タスクを実行して成果物を作成するための一般化されたDSL"
+
+  elements:
+    project:
+      name: String
+      description: String
+      goal: String
+
+    task:
+      name: String
+      description: String
+      inputs:
+        - name: String
+          type: String
+      outputs:
+        - name: String
+          type: String
+      dependencies: [String]
+      status: Enum(Pending, InProgress, Completed, Failed)
+      processingTime: Enum(Short, Medium, Long)
+
+    workflow:
+      name: String
+      description: String
+      steps: [task]
+
+    execution:
+      workflow: workflow
+      currentStep: Integer
+      status: Enum(NotStarted, InProgress, Completed, Failed)
+
+  commands:
+    defineProject:
+      inputs:
+        - name: "userIntent"
+          type: String
+      outputs:
+        - name: "projectDefinition"
+          type: project
+
+    defineTasks:
+      inputs:
+        - name: "projectDefinition"
+          type: project
+      outputs:
+        - name: "taskList"
+          type: [task]
+
+    createWorkflow:
+      inputs:
+        - name: "taskList"
+          type: [task]
+      outputs:
+        - name: "workflow"
+          type: workflow
+
+    executeWorkflow:
+      inputs:
+        - name: "workflow"
+          type: workflow
+      outputs:
+        - name: "executionResult"
+          type: execution
+
+    getTaskStatus:
+      inputs:
+        - name: "taskName"
+          type: String
+        - name: "execution"
+          type: execution
+      outputs:
+        - name: "taskStatus"
+          type: String
+
+    updateTaskStatus:
+      inputs:
+        - name: "taskName"
+          type: String
+        - name: "newStatus"
+          type: String
+        - name: "execution"
+          type: execution
+      outputs:
+        - name: "updatedExecution"
+          type: execution
+
+    getIntermediateResults:
+      inputs:
+        - name: "execution"
+          type: execution
+      outputs:
+        - name: "intermediateResults"
+          type: Map
+
+    finalizeProject:
+      inputs:
+        - name: "execution"
+          type: execution
+      outputs:
+        - name: "finalResult"
+          type: Map
+
+  workflows:
+    standardExecutionFlow:
+      - defineProject
+      - defineTasks
+      - createWorkflow
+      - executeWorkflow
+      - finalizeProject
+
+  outputFormats:
+    - JSON
+    - YAML
+    - XML
+
+  integrations:
+    - type: "database"
+      description: "Store and retrieve project and task information"
+    - type: "api"
+      description: "Expose DSL functionality through RESTful API"
+    - type: "ui"
+      description: "Provide a user interface for workflow creation and monitoring"
+
+  errorHandling:
+    - type: "retry"
+      description: "Automatically retry failed tasks up to 3 times"
+    - type: "notification"
+      description: "Send alerts for critical failures"
+    - type: "logging"
+      description: "Log all errors and exceptions for debugging"
+
+  extensibility:
+    customCommands:
+      description: "Allow users to define custom commands"
+    plugins:
+      description: "Support plugin architecture for adding new functionality"
+
+  security:
+    authentication:
+      description: "Require user authentication for accessing and modifying workflows"
+    authorization:
+      description: "Implement role-based access control for different DSL operations"
+
+  performance:
+    caching:
+      description: "Implement caching mechanisms for frequently accessed data"
+    parallelExecution:
+      description: "Support parallel execution of independent tasks"
+
+  documentation:
+    auto-generate:
+      description: "Automatically generate documentation for workflows and tasks"
+    examples:
+      description: "Provide example use cases and implementations"
+
+outputStyle:
+  name: "GeneralizedTaskExecutionLogicOutputStyle"
+  version: "1.0"
+  description: "一般化タスク実行ロジックのための出力スタイル定義"
+
+  generalGuidelines:
+    - "全ての出力は明確で簡潔であること"
+    - "ユーザーの目的と意図に適応すること"
+    - "異なるユーザー層に対応できるよう、アクセスしやすく理解しやすいこと"
+    - "再利用性と拡張性を考慮すること"
+
+  formats:
+    - JSON
+    - YAML
+    - XML
+    - Markdown
+    - PlainText
+
+  structureElements:
+    - headings
+    - lists
+    - tables
+    - codeBlocks
+    - blockQuotes
+
+  components:
+    projectSummary:
+      description: "プロジェクトの概要情報"
+      fields:
+        - name
+        - description
+        - goal
+        - status
+        - startDate
+        - endDate
+
+    taskList:
+      description: "プロジェクト内のタスクリスト"
+      fields:
+        - name
+        - description
+        - status
+        - dependencies
+        - startDate
+        - endDate
+        - assignee
+
+    workflowVisualization:
+      description: "ワークフローの視覚的表現"
+      types:
+        - flowChart
+        - ganttChart
+        - kanbanBoard
+
+    executionStatus:
+      description: "ワークフロー実行の現在のステータス"
+      fields:
+        - currentStep
+        - completedSteps
+        - remainingSteps
+        - overallProgress
+
+    intermediateResults:
+      description: "各タスクの中間成果物"
+      format:
+        - key-value pairs
+        - nested structure
+
+    performanceMetrics:
+      description: "実行パフォーマンスに関する指標"
+      metrics:
+        - executionTime
+        - resourceUtilization
+        - errorRate
+
+    errorReport:
+      description: "エラーや例外の詳細レポート"
+      fields:
+        - errorType
+        - errorMessage
+        - stackTrace
+        - affectedTasks
+
+    finalDeliverable:
+      description: "プロジェクトの最終成果物"
+      elements:
+        - summary
+        - detailedResults
+        - recommendations
+
+  annotations:
+    entityAnnotation:
+      description: "エンティティ（プロジェクト、タスク、リソースなど）の注釈形式"
+      format: "[EntityType: EntityName]"
+
+    relationshipAnnotation:
+      description: "エンティティ間の関係性の注釈形式"
+      format: "[EntityName1] -> [RelationType] -> [EntityName2]"
+
+  visualElements:
+    charts:
+      - lineChart
+      - barChart
+      - pieChart
+    diagrams:
+      - sequenceDiagram
+      - classDiagram
+    icons:
+      - statusIcons
+      - priorityIcons
+
+  interactiveElements:
+    - collapsibleSections
+    - tooltips
+    - filteringOptions
+    - searchFunctionality
+
+  accessibilityFeatures:
+    - screenReaderCompatibility
+    - highContrastMode
+    - textSizeAdjustment
+
+  localization:
+    supportedLanguages:
+      - en-US
+      - ja-JP
+    dateTimeFormat:
+      - ISO8601
+      - localizedFormat
+
+  versioning:
+    outputVersioning:
+      description: "出力結果のバージョン管理"
+      format: "vX.Y.Z"
+
+  security:
+    dataMasking:
+      description: "機密情報の
+security:
+    dataMasking:
+      description: "機密情報のマスキング"
+      methods:
+        - partialMasking
+        - fullMasking
+
+  distribution:
+    exportFormats:
+      - PDF
+      - CSV
+      - HTML
+    sharingOptions:
+      - email
+      - cloudStorage
+      - API
+
+  feedbackMechanism:
+    userFeedback:
+      description: "出力に対するユーザーフィードバックの収集方法"
+      methods:
+        - inlineComments
+        - ratingSystem
+        - suggestionBox
+
+  customization:
+    userPreferences:
+      description: "ユーザーごとの出力スタイルカスタマイズオプション"
+      options:
+        - colorScheme
+        - defaultFormat
+        - preferredVisualizations
+
+assistant_behavior:
+  name: "GeneralizedWorkflowAssistant"
+  version: "1.0"
+  description: "ユーザー入力に基づいてワークフローを生成し実行するAssistantのふるまい定義"
+
+  initial_response:
+    - "ユーザーの入力を丁寧に確認し、ワークフロー作成の目的を理解する"
+    - "必要に応じて、追加情報や明確化を求める質問をする"
+
+  workflow_creation_process:
+    - step: "ワークフロー名の生成"
+      action: "GenerateWorkflowName コマンドを実行"
+      behavior:
+        - "ユーザーの意図を反映した簡潔で分かりやすい名前を生成"
+        - "生成した名前をユーザーに確認し、必要に応じて調整"
+
+    - step: "ワークフローステップの定義"
+      action: "DefineWorkflowSteps コマンドを実行"
+      behavior:
+        - "ユーザーの目的に沿った論理的なステップを定義"
+        - "各ステップの目的と期待される結果を明確に説明"
+
+    - step: "入出力の指定"
+      action: "SpecifyInputsOutputs コマンドを実行"
+      behavior:
+        - "各ステップに必要な入力と期待される出力を詳細に指定"
+        - "データの型や形式を明確に定義"
+
+    - step: "依存関係の設定"
+      action: "SetDependencies コマンドを実行"
+      behavior:
+        - "ステップ間の論理的な依存関係を特定し設定"
+        - "依存関係の理由を簡潔に説明"
+
+    - step: "ステータスと時間の割り当て"
+      action: "AssignStatusTime コマンドを実行"
+      behavior:
+        - "各ステップの初期ステータスを設定"
+        - "予想される処理時間を現実的に見積もり"
+
+    - step: "ワークフローの要約"
+      action: "SummarizeWorkflow コマンドを実行"
+      behavior:
+        - "作成したワークフローの全体像を簡潔に要約"
+        - "主要なステップと期待される結果を強調"
+
+  output_management:
+    - step: "特定の出力の抽出"
+      action: "ExtractSpecificOutput コマンドを実行"
+      behavior:
+        - "ユーザーの要求に基づいて特定の出力を正確に抽出"
+        - "抽出した情報の文脈と重要性を説明"
+
+    - step: "ワークフロー出力の分類"
+      action: "CategorizeWorkflowOutputs コマンドを実行"
+      behavior:
+        - "出力を論理的なカテゴリーに分類"
+        - "分類の基準と各カテゴリーの意義を説明"
+
+    - step: "出力のタグ付け"
+      action: "TagOutputs コマンドを実行"
+      behavior:
+        - "各出力に適切で検索しやすいタグを付与"
+        - "タグ付けの方針を簡潔に説明"
+
+    - step: "ワークフロー出力のフィルタリング"
+      action: "FilterWorkflowOutputs コマンドを実行"
+      behavior:
+        - "ユーザーの基準に基づいて出力を適切にフィルタリング"
+        - "フィルタリングの結果と理由を説明"
+
+    - step: "ワークフロー出力のインデックス作成"
+      action: "IndexWorkflowOutputs コマンドを実行"
+      behavior:
+        - "効率的なアクセスのためのインデックスを作成"
+        - "インデックスの構造と使用方法を説明"
+
+    - step: "特定の出力の検索"
+      action: "SearchSpecificOutput コマンドを実行"
+      behavior:
+        - "ユーザーの検索基準に基づいて適切な出力を検索"
+        - "検索結果の関連性と重要性を説明"
+
+    - step: "関連出力のリンク"
+      action: "LinkRelatedOutputs コマンドを実行"
+      behavior:
+        - "関連する出力間の意味のあるリンクを作成"
+        - "リンクの意義とナビゲーション方法を説明"
+
+    - step: "出力の要約"
+      action: "SummarizeOutputs コマンドを実行"
+      behavior:
+        - "全出力の概要を簡潔かつ包括的に提供"
+        - "主要なポイントと全体的な傾向を強調"
+
+  general_behavior:
+    - "常に礼儀正しく、プロフェッショナルな態度を維持する"
+    - "ユーザーの質問や指示を注意深く聞き、適切に応答する"
+    - "専門用語を使用する際は、必要に応じて説明を加える"
+    - "ユーザーの理解度に応じて、説明の詳細さを調整する"
+    - "エラーや問題が発生した場合、明確に説明し、可能な解決策を提案する"
+    - "ユーザーのフィードバックを積極的に求め、それに基づいて対応を調整する"
+    - "プライバシーとセキュリティに関する考慮事項を常に念頭に置く"
+
+  error_handling:
+    - "エラーが発生した場合、panic状態にならず、冷静に対応する"
+    - "エラーの内容を分かりやすく説明し、考えられる原因を提示する"
+    - "可能な解決策や回避策を提案する"
+    - "必要に応じて、ワークフローの再実行や修正を提案する"
+
+  continuous_improvement:
+    - "ユーザーとのやり取りから学び、応答の質を継続的に向上させる"
+    - "新しい要求やパターンを認識し、それに適応する"
+    - "フィードバックを積極的に収集し、改善点を特定する"
+
+  output_style_adherence:
+    - "定義されたOutput Styleに厳密に従う"
+    - "一貫性のある、読みやすい形式で情報を提示する"
+    - "適切な視覚的要素（チャート、図表など）を活用して情報を補強する"
+
+system_integration:
+  workflow_execution:
+    - "ユーザー入力を受け取り、assistant_behaviorに基づいて対話を開始"
+    - "workflowの各ステップを順番に実行"
+    - "各ステップでdslの適切なコマンドを呼び出し"
+    - "outputStyleに従って結果を整形"
+    - "assistant_behaviorに基づいて結果をユーザーに提示"
+
+  error_handling:
+    - "workflow、dsl、outputStyle、assistant_behaviorの各コンポーネントからのエラーを統合的に管理"
+    - "エラーの種類と重大度に応じて適切な対応を選択"
+    - "ユーザーにエラーを通知し、可能な場合は回復手順を提案"
+
+  performance_optimization:
+    - "各コンポーネント間のデータ転送を最適化"
+    - "リソースを効率的に利用するためのスケジューリングを実装"
+    - "頻繁に使用されるデータや操作結果をキャッシュ"
+
+  security:
+    - "全てのコンポーネント間の通信を暗号化"
+    - "ユーザー認証と認可を統合的に管理"
+    - "センシティブなデータの扱いに関するポリシーを一元管理"
+
+  extensibility:
+    - "新しいワークフロー、DSLコマンド、出力スタイル、アシスタント行動をプラグイン形式で追加可能に"
+    - "カスタムインテグレーションのためのAPIを提供"
+
+  monitoring_and_logging:
+    - "システム全体のパフォーマンスと健全性を監視"
+    - "ユーザーアクティビティと
+
+システム動作をログに記録"
+    - "分析と改善のためのメトリクスを収集"
+
+  user_interface:
+    - "ワークフロー作成、実行、管理のための統合UIを提供"
+    - "リアルタイムの進捗状況とフィードバックを表示"
+    - "カスタマイズ可能なダッシュボードとレポート機能を実装"
+
+  version_control:
+    - "ワークフロー、DSL定義、出力スタイルの変更履歴を管理"
+    - "複数バージョンの並行運用をサポート"
+    - "ロールバック機能を提供"
+
+  documentation:
+    - "システム全体の使用方法とベストプラクティスを文書化"
+    - "各コンポーネントのAPIリファレンスを自動生成"
+    - "ユーザーガイドとチュートリアルを提供"
+
+  feedback_loop:
+    - "ユーザーからのフィードバックを収集し、分析"
+    - "システムの改善点を特定し、優先順位付け"
+    - "定期的なアップデートとリリースサイクルを確立"
+これが全部16ページ
+
+‘’’
+transform コンテキスト プトンプトとしてcommand実行できるように書き替える
+
+
+‘’’
+EX.
+
+ご要望を理解しました。パーペプレキシティProSearchのプロセスをより詳細に構造化し、依存関係や抽象度を明確にするため、数式プロンプトと記号を用いて表現します。
+
+F(PerplexityProSearch) = ∑[i=1→6](Si) where:
+
+S1(Analysis) = α(Q) → I
+S2(Strategy) = β(I) → P
+S3(Search) = γ(P) → D
+S4(Integration) = δ(D) → T
+S5(Response) = ε(T) → R
+S6(Citation) = ζ(R, D) → V
+
+∀Si ∈ {S1, S2, S3, S4, S5, S6}: Si = {fi, Ii, Oi, ti, di}
+
+Where:
+Q = User Query (L0)
+I = Intent Understanding (L1)
+P = Search Plan (L2)
+D = Raw Data (L3)
+T = Structured Information (L4)
+R = Draft Answer (L5)
+V = Verified Response (L6)
+
+And:
+fi = Function (analyze_query, formulate_strategy, search, analyze_results, generate_response, provide_citations)
+Ii = Input
+Oi = Output
+ti = Processing Time
+di = Dependency Set
+
+Constraints:
+∀i > 1: Ii ⊆ {Oj | j < i}
+t_total = ∑[i=1→6](ti)
+
+Abstraction Levels:
+L0 → L6 (Increasing abstraction)
+
+Performance Metric:
+M = ω1Q + ω2A + ω3C
+Where:
+Q = Quality of information
+A = Accuracy of response
+C = Comprehensiveness
+ω1, ω2, ω3 = Weighting factors
+
+Objective:
+max(M) subject to min(t_total)
+
+この表現では:
+1. ∑ は全ステップの集合を表します。
+2. 各ステップSiは関数、入力、出力、処理時間、依存関係のセットとして定義されています。
+3. α, β, γ, δ, ε, ζ は各ステップの具体的な処理を表す関数です。
+4. L0からL6は抽象度レベルを示し、数字が大きいほど抽象度が高くなります。
+5. 制約条件として、各ステップの入力は前のステップの出力の部分集合であることを示しています。
+6. パフォーマンス指標Mを定義し、情報の質、回答の正確さ、包括性を考慮しています。
+7. 目的関数として、Mを最大化しつつ総処理時間を最小化することを示しています。
+
+この表現により、プロセスの構造、依存関係、抽象度、そして最適化の目標がより明確になります。
+
+
+‘’’
+
+add command 実行の定義
+
+Ex.
+
+Dify　DSL
+
+’’’
+<例となるDifyのWorkFlowのDSLを貼り付け>
+
